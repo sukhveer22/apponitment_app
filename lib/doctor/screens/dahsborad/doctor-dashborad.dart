@@ -7,6 +7,8 @@ import 'package:app_apponitmnet/doctor/screens/profile_screens/dcotor-mian-profi
 import 'package:app_apponitmnet/patient/screens/appointment-show.dart';
 import 'package:app_apponitmnet/util/all_chat.dart';
 
+import '../appoinyment_show_screen.dart';
+
 enum _SelectedTab { Home, Chat, Appointment, Profile }
 
 class NavigationController extends GetxController {
@@ -83,7 +85,7 @@ class DoctorDashboard extends StatelessWidget {
         children: [
           DoctorHomeScreen(),
           AllChatScreen(),
-          AppointmentListScreen(),
+          DoctorAppointmentListScreen(),
           AllProfile(),
         ],
       ),

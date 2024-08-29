@@ -1,3 +1,5 @@
+import 'package:app_apponitmnet/patient/screens/appointment-show.dart';
+import 'package:app_apponitmnet/patient/screens/payment_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -109,6 +111,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
             focusColor: Colors.white,
           ),
           // home: AllChatScreen(),
+          // home:AppointmentListScreen(),
           home: _getInitialScreen(userrole),
         );
       },
@@ -146,87 +149,3 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
   }
 }
 
-class SelectFormScreen extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Select Form'),
-        backgroundColor: Colors.blue,
-      ),
-      body: ListView(
-        padding: EdgeInsets.all(16.0),
-        children: [
-          ListTile(
-            leading: Icon(Icons.email, color: Colors.blue),
-            title: Text('Email Form'),
-            onTap: () {
-              Navigator.pop(context);
-              // Handle selection of Email Form
-              Get.to(() => EmailFormScreen());
-            },
-          ),
-          ListTile(
-            leading: Icon(Icons.phone, color: Colors.blue),
-            title: Text('Phone Form'),
-            onTap: () {
-              Navigator.pop(context);
-              // Handle selection of Phone Form
-              Get.to(() => PhoneFormScreen());
-            },
-          ),
-          ListTile(
-            leading: Icon(Icons.calendar_today, color: Colors.blue),
-            title: Text('Appointment Form'),
-            onTap: () {
-              Navigator.pop(context);
-              // Handle selection of Appointment Form
-              Get.to(() => AppointmentFormScreen());
-            },
-          ),
-          // Add more options as needed
-        ],
-      ),
-    );
-  }
-}
-
-// Example form screens
-class EmailFormScreen extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Email Form'),
-        backgroundColor: Colors.blue,
-      ),
-      body: Center(child: Text('Email Form Content')),
-    );
-  }
-}
-
-class PhoneFormScreen extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Phone Form'),
-        backgroundColor: Colors.blue,
-      ),
-      body: Center(child: Text('Phone Form Content')),
-    );
-  }
-}
-
-class AppointmentFormScreen extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Appointment Form'),
-        backgroundColor: Colors.blue,
-      ),
-      body: Center(child: Text('Appointment Form Content')),
-    );
-  }
-}

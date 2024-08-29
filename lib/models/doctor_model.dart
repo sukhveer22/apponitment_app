@@ -8,8 +8,10 @@ class Doctors {
   final String? phoneNumber;
   final String? profilePictureUrl;
   final String? role;
-
   final String? categoryId;
+  final String? location; // New field
+  final String? gender; // New field
+  final int age; // New field
 
   Doctors({
     required this.id,
@@ -20,6 +22,9 @@ class Doctors {
     this.profilePictureUrl,
     this.categoryId,
     this.role,
+    this.location,
+    this.gender,
+    required this.age,
   });
 
   // Convert a Doctor object to a map for Firestore storage
@@ -33,6 +38,9 @@ class Doctors {
       'phoneNumber': phoneNumber,
       'profilePictureUrl': profilePictureUrl,
       'categoryId': categoryId,
+      'location': location,
+      'gender': gender,
+      'age': age,
     };
   }
 
@@ -49,6 +57,9 @@ class Doctors {
       role: data['role'],
       profilePictureUrl: data['profilePictureUrl'],
       categoryId: data['categoryId'],
+      location: data['location'],
+      gender: data['gender'],
+      age: data['age'] ?? 0, // Default to 0 if not present
     );
   }
 
@@ -63,8 +74,12 @@ class Doctors {
       role: map['role'],
       profilePictureUrl: map['profilePictureUrl'],
       categoryId: map['categoryId'],
+      location: map['location'],
+      gender: map['gender'],
+      age: map['age'] ?? 0, // Default to 0 if not present
     );
   }
+
   factory Doctors.fromDocument(Map<String, dynamic> doc) {
     return Doctors(
       id: doc['id'] ?? '',
@@ -74,6 +89,9 @@ class Doctors {
       phoneNumber: doc['phoneNumber'] ?? '',
       profilePictureUrl: doc['profilePictureUrl'] ?? '',
       specialty: doc['specialty'] ?? '',
+      location: doc['location'],
+      gender: doc['gender'],
+      age: doc['age'] ?? 0, // Default to 0 if not present
     );
   }
 }

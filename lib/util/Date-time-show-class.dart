@@ -1,7 +1,6 @@
 import 'package:easy_date_timeline/easy_date_timeline.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:get/get_utils/src/extensions/widget_extensions.dart';
 
 class DateCapsule extends StatefulWidget {
   final DateTime date;
@@ -109,7 +108,7 @@ class TimeCapsule extends StatefulWidget {
 }
 
 class _TimeCapsuleState extends State<TimeCapsule> {
-  bool _isSelected = false;
+  bool _isSelected = true;
 
   @override
   void initState() {

@@ -29,6 +29,7 @@ class ChatController extends GetxController {
   var isTyping = false.obs;
   var targetUserTyping = false.obs;
   RxString targetUserImage = "".obs;
+  RxBool userActive = false.obs;
   RxString targetUserName = "".obs;
   RxBool isSendingImage = false.obs;
 
@@ -149,6 +150,7 @@ class ChatController extends GetxController {
           await _firestore.collection('Users').doc(targetUserId).get();
       targetUserImage.value = doc["profilePictureUrl"] ?? "";
       targetUserName.value = doc["name"] ?? "";
+      userActive.value = doc['status'] == 'online';
       if (UserRole.patient == "patient") {
         if (chatroom.chatroomid!.isNotEmpty) {
           await _firestore
@@ -187,32 +189,42 @@ class ChatController extends GetxController {
       MessageModel newMessage = MessageModel(
         messageid: Uuid().v1(),
         sender: currentUser?.uid ?? "",
-        createdon: DateTime.timestamp(),  // Set the creation time of the message
+        createdon: DateTime.now(), // Changed to Timestamp.now()
         text: msg,
-        imageUrl: "",
         seen: false,
       );
 
       try {
-        await _firestore.collection("chatRooms")
+        // Add debug prints to check values
+        print("Sending message: $msg");
+        print("Chatroom ID: ${chatroom.chatroomid}");
+        print("Current User ID: ${currentUser?.uid}");
+
+        // Send the new message to Firestore
+        await _firestore
+            .collection("chatRooms")
             .doc(chatroom.chatroomid)
             .collection("messages")
             .doc(newMessage.messageid)
             .set(newMessage.toMap());
 
         // Update the lastMessage and lastMessageTimestamp fields
-        await _firestore.collection("chatRooms")
+        await _firestore
+            .collection("chatRooms")
             .doc(chatroom.chatroomid)
             .update({
           'lastMessage': msg,
-          'lastMessageTimestamp': FieldValue.serverTimestamp(),  // Use server timestamp
         });
 
         print("Message Sent!");
       } catch (e) {
+        // Catch and display any errors
+        print("Error sending message: $e");
         Get.snackbar("Error", "Failed to send message: $e",
             snackPosition: SnackPosition.BOTTOM);
       }
+    } else {
+      print("Message is empty or whitespace");
     }
   }
 

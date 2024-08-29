@@ -16,58 +16,38 @@ import 'package:uuid/uuid.dart';
 
 import '../../util/Date-time-show-class.dart';
 
-class AppointmentScreen extends StatelessWidget {
+class AppointmentScreen extends StatefulWidget {
   final String doctorId;
-  late String selectedDates = "";
-  String selectedTimes = "";
-  User? firebaseuid = FirebaseAuth.instance.currentUser;
 
   AppointmentScreen({super.key, required this.doctorId});
 
+  @override
+  State<AppointmentScreen> createState() => _AppointmentScreenState();
+}
+
+class _AppointmentScreenState extends State<AppointmentScreen> {
+  late String selectedDates = "";
+
+  String selectedTimes = "";
+
+  User? firebaseuid = FirebaseAuth.instance.currentUser;
+
   final AppointmentController controller = Get.put(AppointmentController());
 
-  DateTime? _selectedDate;
-  int? _selectedTime;
+  void initState() {
+    super.initState();
+    _checkAppointment();
+  }
 
-  Future<ChatRoomModel?> getChatRoomModel(String doctorId) async {
-    final currentUserId = firebaseuid?.uid;
-
-    if (currentUserId == null) {
-      print("Current user ID is null");
-      return null;
-    }
-
-    try {
-      final chatroomSnapshot = await FirebaseFirestore.instance
-          .collection('chatRoom')
-          .where('participants.$currentUserId', isEqualTo: true)
-          .where('participants.$doctorId', isEqualTo: true)
-          .limit(1)
-          .get();
-
-      if (chatroomSnapshot.docs.isNotEmpty) {
-        return ChatRoomModel.fromMap(
-            chatroomSnapshot.docs.first.data());
-      }
-
-      final newChatRoom = ChatRoomModel(
-        chatroomid: Uuid().v1(),
-        participants: {
-          currentUserId: true,
-          doctorId: true,
-        },
-        lastMessage: '',
-      );
-
-      await FirebaseFirestore.instance
-          .collection('chatRoom')
-          .doc(newChatRoom.chatroomid)
-          .set(newChatRoom.toMap());
-
-      return newChatRoom;
-    } catch (e) {
-      print('Error getting or creating chat room: $e');
-      return null;
+  Future<void> _checkAppointment() async {
+    var appointmentDoc = await FirebaseFirestore.instance
+        .collection('appointments')
+        .doc(widget.doctorId + firebaseuid!.uid.toString())
+        .get();
+    if (appointmentDoc.exists) {
+      controller.buttonname.value = true;
+    } else {
+      controller.buttonname.value = false;
     }
   }
 
@@ -79,7 +59,7 @@ class AppointmentScreen extends StatelessWidget {
           StreamBuilder<DocumentSnapshot>(
             stream: FirebaseFirestore.instance
                 .collection('Users')
-                .doc(doctorId)
+                .doc(widget.doctorId)
                 .snapshots(),
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
@@ -102,8 +82,8 @@ class AppointmentScreen extends StatelessWidget {
 
               String specialty = doctorData["specialty"] ?? 'No specialty';
               String categoryId = doctorData["categoryId"]
-                  ?.toString()
-                  .replaceAll("Category.", "") ??
+                      ?.toString()
+                      .replaceAll("Category.", "") ??
                   'No Category';
               DateTime startDate;
               DateTime endDate;
@@ -113,7 +93,8 @@ class AppointmentScreen extends StatelessWidget {
                 endDate = DateTime.parse(endDateStr);
               } catch (e) {
                 startDate = DateTime.now();
-                endDate = startDate.add(Duration(days: 30)); // Default to 30 days if parse fails
+                endDate = startDate.add(
+                    Duration(days: 30)); // Default to 30 days if parse fails
               }
 
               int totalDays = endDate.difference(startDate).inDays + 1;
@@ -137,6 +118,7 @@ class AppointmentScreen extends StatelessWidget {
                       ClipRRect(
                         borderRadius: BorderRadius.circular(20.r),
                         child: Image.network(
+                          height: 200,
                           profilePictureUrl,
                           errorBuilder: (context, error, stackTrace) {
                             return Icon(Icons.error, size: 100.w);
@@ -145,33 +127,6 @@ class AppointmentScreen extends StatelessWidget {
                       )
                     else
                       Icon(Icons.account_circle, size: 100.w),
-                    SizedBox(height: 10.h),
-                    Text(
-                      name,
-                      style: TextStyle(
-                        fontSize: 20.sp,
-                        fontWeight: FontWeight.w900,
-                      ),
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          "Category: ",
-                          style: TextStyle(
-                            fontSize: 20.sp,
-                            fontWeight: FontWeight.w900,
-                          ),
-                        ),
-                        Text(
-                          categoryId,
-                          style: TextStyle(
-                            fontSize: 16.sp,
-                            fontWeight: FontWeight.w900,
-                          ),
-                        ),
-                      ],
-                    ),
                     SizedBox(height: 10),
                     Expanded(
                       child: Container(
@@ -194,7 +149,32 @@ class AppointmentScreen extends StatelessWidget {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
+                              Row(
+                                children: [
+                                  Text(
+                                    "Name: ",
+                                    style: AppTextStyles.header,
+                                  ),
+                                  Text(
+                                    name,
+                                    style: AppTextStyles.body,
+                                  ),
+                                ],
+                              ),
                               Divider(),
+
+                              Row(
+                                children: [
+                                  Text(
+                                    "Category: ",
+                                    style: AppTextStyles.header,
+                                  ),
+                                  Text(
+                                    categoryId,
+                                    style: AppTextStyles.body,
+                                  ),
+                                ],
+                              ),
                               Text(
                                 "Specialty:",
                                 style: AppTextStyles.header,
@@ -221,15 +201,15 @@ class AppointmentScreen extends StatelessWidget {
                                     itemCount: totalDays,
                                     itemBuilder: (context, index) {
                                       DateTime date =
-                                      startDate.add(Duration(days: index));
+                                          startDate.add(Duration(days: index));
                                       return Center(
                                         child: DateCapsule(
                                           date: date,
-                                          isSelected: true,
+                                          isSelected: false,
                                           dates: startDate.day + index,
                                           onTap: () {
                                             selectedDates =
-                                            "${EasyDateFormatter.shortMonthName(date, "en_US")} ${startDate.day + index} ${EasyDateFormatter.shortDayName(date, "en_US")}";
+                                                "${EasyDateFormatter.shortMonthName(date, "en_US")} ${startDate.day + index} ${EasyDateFormatter.shortDayName(date, "en_US")}";
                                           },
                                         ),
                                       ).paddingSymmetric(horizontal: 10);
@@ -255,10 +235,15 @@ class AppointmentScreen extends StatelessWidget {
                                     itemBuilder: (context, index) {
                                       return TimeCapsule(
                                         time: timeSlots[index],
-                                        isSelected: selectedTimes.endsWith('AM') &&
-                                            timeSlots[index] == int.parse(selectedTimes.split('AM').first),
+                                        isSelected:
+                                            selectedTimes.endsWith('AM') &&
+                                                timeSlots[index] ==
+                                                    int.parse(selectedTimes
+                                                        .split('AM')
+                                                        .first),
                                         onTap: () {
-                                          selectedTimes = "${timeSlots[index]}AM";
+                                          selectedTimes =
+                                              "${timeSlots[index]}AM";
                                         },
                                         text: 'AM',
                                       ).paddingSymmetric(horizontal: 10);
@@ -280,10 +265,15 @@ class AppointmentScreen extends StatelessWidget {
                                     itemBuilder: (context, index) {
                                       return TimeCapsule(
                                         time: timeSlots[index],
-                                        isSelected: selectedTimes.endsWith('PM') &&
-                                            timeSlots[index] == int.parse(selectedTimes.split('PM').first),
+                                        isSelected:
+                                            selectedTimes.endsWith('PM') &&
+                                                timeSlots[index] ==
+                                                    int.parse(selectedTimes
+                                                        .split('PM')
+                                                        .first),
                                         onTap: () {
-                                          selectedTimes = "${timeSlots[index]}PM";
+                                          selectedTimes =
+                                              "${timeSlots[index]}PM";
                                         },
                                         text: 'PM',
                                       ).paddingSymmetric(horizontal: 10);
@@ -294,19 +284,23 @@ class AppointmentScreen extends StatelessWidget {
                               SizedBox(height: 20),
                               Row(
                                 mainAxisAlignment:
-                                MainAxisAlignment.spaceBetween,
+                                    MainAxisAlignment.spaceBetween,
                                 children: [
                                   CustomButton(
                                     width: 150.w,
                                     fontSize: 12.sp,
                                     text: "Send message",
                                     onPressed: () async {
-                                      final chatroomModel = await getChatRoomModel(doctorId);
+                                      final chatroomModel =
+                                          await getChatRoomModel(
+                                              widget.doctorId);
                                       if (chatroomModel != null) {
-                                        Get.to(() => ChatRoomPage(
-                                          targetUserId: doctorId,
-                                          chatroom: chatroomModel,
-                                        ));
+                                        Get.to(
+                                          () => ChatRoomPage(
+                                            targetUserId: widget.doctorId,
+                                            chatroom: chatroomModel,
+                                          ),
+                                        );
                                       } else {
                                         Get.snackbar(
                                           'Error',
@@ -316,28 +310,36 @@ class AppointmentScreen extends StatelessWidget {
                                       }
                                     },
                                   ),
-                                  CustomButton(
-                                    width: 150.w,
-                                    text: "Book Appointment",
-                                    fontSize: 12.sp,
-                                    onPressed: () {
-                                      if (selectedDates.isNotEmpty &&
-                                          selectedTimes.isNotEmpty) {
-                                        controller.saveAppointment(
-                                          selectedDate: selectedDates,
-                                          selectedTime: selectedTimes,
-                                          doctoruid: doctorId,
-                                          doctorImage: profilePictureUrl,
-                                        );
-                                      } else {
-                                        Get.snackbar('Error',
-                                            'Please select a date and time.',
-                                            colorText: Colors.white,
-                                            backgroundColor: Colors.red,
-                                            snackPosition:
-                                            SnackPosition.BOTTOM);
-                                      }
-                                    },
+                                  Obx(
+                                    () => CustomButton(
+                                      width: 150.w,
+                                      text: controller.buttonname.value
+                                          ? "Appointment Update"
+                                          : "Book Appointment",
+                                      fontSize: 12.sp,
+                                      onPressed: () {
+                                        _checkAppointment();
+                                        if (selectedDates.isNotEmpty &&
+                                            selectedTimes.isNotEmpty) {
+                                          controller.saveAppointment(
+                                            selectedDate: selectedDates,
+                                            selectedTime: selectedTimes,
+                                            doctoruid: widget.doctorId,
+                                            doctorImage: profilePictureUrl,
+                                            userImage: firebaseuid!.photoURL
+                                                .toString(),
+                                            doctorName: name,
+                                          );
+                                        } else {
+                                          Get.snackbar('Error',
+                                              'Please select a date and time.',
+                                              colorText: Colors.white,
+                                              backgroundColor: Colors.red,
+                                              snackPosition:
+                                                  SnackPosition.BOTTOM);
+                                        }
+                                      },
+                                    ),
                                   ),
                                 ],
                               ),

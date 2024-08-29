@@ -22,15 +22,24 @@ enum Category {
   other,
 }
 
+enum Gender {
+  male,
+  female,
+  other,
+}
+
 class DoctorSignController extends GetxController {
   var nameController = TextEditingController(text: "Dr.");
   var emailController = TextEditingController();
   var phoneNumberController = TextEditingController();
-
   var passwordController = TextEditingController();
   var specialtyController = TextEditingController();
-  var selectedCategory =Category.Dentist.obs;
+  var locationController = TextEditingController(); // New
+  var genderController = TextEditingController(); // New
+  var ageController = TextEditingController(); // New
 
+  var selectedCategory = Category.Dentist.obs;
+  var selectedGender = Gender.female.obs;
   var isPasswordHidden = true.obs;
   var isLoading = false.obs;
   Rx<CroppedFile?> imageFile = Rx<CroppedFile?>(null);
@@ -41,6 +50,10 @@ class DoctorSignController extends GetxController {
 
   void setCategory(Category category) {
     selectedCategory.value = category;
+  }
+
+  void setGender(Gender gender) {
+    selectedGender.value = gender;
   }
 
   Future<void> signUp() async {
@@ -80,7 +93,12 @@ class DoctorSignController extends GetxController {
           phoneNumber: phoneNumberController.text.trim(),
           profilePictureUrl: profilePictureUrl,
           categoryId: selectedCategory.value.toString().trim(),
-          role: 'Doctor', // Set the role as 'Doctor'
+          role: 'Doctor',
+          location: locationController.text.trim(),
+          // New
+          gender: genderController.text.trim(),
+          // New
+          age: int.tryParse(ageController.text.trim()) ?? 0, // New
         );
 
         await saveDoctorToFirestore(doctor);
@@ -102,8 +120,14 @@ class DoctorSignController extends GetxController {
         specialtyController.text.trim().isEmpty ||
         emailController.text.trim().isEmpty ||
         passwordController.text.trim().isEmpty ||
-        selectedCategory.value.toString().trim().isEmpty) {
-      Get.snackbar('Error', 'Please fill in all fields.');
+        selectedCategory.value.toString().trim().isEmpty ||
+        locationController.text.trim().isEmpty || // New
+        genderController.text.trim().isEmpty || // New
+        ageController.text.trim().isEmpty) {
+      Get.snackbar(
+          backgroundColor: Colors.redAccent,
+          'Error',
+          'Please fill in all fields.');
       return false;
     }
     return true;

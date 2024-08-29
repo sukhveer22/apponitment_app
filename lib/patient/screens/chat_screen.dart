@@ -170,16 +170,37 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                           ),
                         ),
                         SizedBox(width: 8.w),
-                        Expanded(
-                          child: Text(
-                            _controller.targetUserName.value,
-                            style: TextStyle(
-                              color: AppColors.textColor,
-                              fontSize: 18.sp,
-                              fontWeight: FontWeight.bold,
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            SizedBox(height: 8.w),
+                            Text(
+                              _controller.targetUserName.value,
+                              style: TextStyle(
+                                color: AppColors.textColor,
+                                fontSize: 18.sp,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
-                          ),
+                            SizedBox(
+                              height: 5,
+                            ),
+                            Obx(
+                              () => Text(
+                                _controller.userActive.value
+                                    ? 'Online'
+                                    : 'Offline',
+                                style: TextStyle(
+                                  color: AppColors.textColor,
+                                  fontSize: 12.sp,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
+                        Spacer(),
                         IconButton(
                           icon: Container(
                             width: 40.w,

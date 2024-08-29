@@ -26,7 +26,7 @@ class _AllChatScreenState extends State<AllChatScreen>
   final TextStyle titleStyle = TextStyle(
     fontSize: 18.sp,
     fontWeight: FontWeight.w900,
-    color: Colors.black,
+    color: AppColors.textColor,
   );
 
   void _clearChat() async {
@@ -219,6 +219,18 @@ class _AllChatScreenState extends State<AllChatScreen>
               controller: searchController.textController,
               hintText: "Search...",
               onChanged: searchController.updateSearchQuery,
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Please enter a search query';
+                }
+                return null;
+              },
+              hintStyle: TextStyle(color: Colors.grey),
+              helperStyle: TextStyle(color: Colors.blue),
+              keyboardType: TextInputType.text,
+              focusedBorderColor: Colors.blue,
+              prefixIcon: Icon(Icons.search, color: Colors.grey),
+              borderColor: Colors.grey,
             ),
           ),
           // Horizontal list of online users
@@ -233,7 +245,7 @@ class _AllChatScreenState extends State<AllChatScreen>
                 ),
               )).paddingSymmetric(horizontal: 10),
           Container(
-            height: 90,
+            height: 100,
             padding: EdgeInsets.symmetric(vertical: 8.0),
             child: StreamBuilder(
               stream: _firestore
@@ -330,16 +342,18 @@ class _AllChatScreenState extends State<AllChatScreen>
                                         ),
                                         child: CircleAvatar(
                                           radius: 30,
-                                          backgroundImage: doctorImage.isNotEmpty
-                                              ? NetworkImage(
-                                                  doctorImage,
-                                                )
-                                              : null,
+                                          backgroundImage:
+                                              doctorImage.isNotEmpty
+                                                  ? NetworkImage(
+                                                      doctorImage,
+                                                    )
+                                                  : null,
                                           child: doctorImage.isEmpty
                                               ? Icon(Icons.person)
                                               : null,
                                         ),
-                                      ),   Text(
+                                      ),
+                                      Text(
                                         doctorName,
                                         style: TextStyle(
                                           fontSize: 8.sp,
@@ -349,7 +363,6 @@ class _AllChatScreenState extends State<AllChatScreen>
                                       ),
                                     ],
                                   ),
-
                               ],
                             ),
                           ),
@@ -434,40 +447,68 @@ class _AllChatScreenState extends State<AllChatScreen>
                         final doctorName = userData['name'] ?? 'Unknown';
                         final doctorImage = userData['profilePictureUrl'] ?? '';
                         final userActive = userData['status'] == 'online';
-
+                        final lastMessage = chatRoom.lastMessage ?? '';
+                        print(">>>>>>>>>>>>>>>>>????${lastMessage.toString()}");
+                        final lastMessageType = chatRoom.lastMessage ?? '';
+                        final truncatedMessage =
+                            lastMessage.split(' ').take(10).join(' ');
                         return Obx(() {
                           if (doctorName
                               .toLowerCase()
                               .contains(searchController.searchQuery.value)) {
-                            return Card(
-                              color: Colors.greenAccent,
-                              child: ListTile(
-                                leading: CircleAvatar(
-                                  maxRadius: 30,
-                                  backgroundImage: doctorImage.isNotEmpty
-                                      ? NetworkImage(doctorImage)
-                                      : null,
-                                  child: doctorImage.isEmpty
-                                      ? Icon(Icons.person)
-                                      : null,
-                                ),
-                                title: Text(doctorName, style: titleStyle),
-                                subtitle: Text(
-                                  userActive ? 'Online' : 'Offline',
-                                  style: TextStyle(
-                                    fontSize: 12.sp,
-                                    color:
-                                        userActive ? Colors.green : Colors.red,
+                            return Padding(
+                              padding: const EdgeInsets.only(top: 5),
+                              child: Card(
+                                color: AppColors.cardColor,
+                                // Set card color here
+                                margin: EdgeInsets.symmetric(
+                                    vertical: 5.h, horizontal: 10.w),
+                                child: ListTile(
+                                  contentPadding: EdgeInsets.all(10.w),
+                                  leading: CircleAvatar(
+                                    backgroundImage: doctorImage.isNotEmpty
+                                        ? NetworkImage(doctorImage)
+                                        : null,
+                                    child: doctorImage.isEmpty
+                                        ? Icon(Icons.person)
+                                        : null,
                                   ),
+                                  title: Text(
+                                    doctorName,
+                                    style: titleStyle,
+                                  ),
+                                  subtitle: lastMessageType == 'image'
+                                      ? Image.network(lastMessage,
+                                          height: 50,
+                                          width: 50,
+                                          fit: BoxFit.cover)
+                                      : Padding(
+                                          padding: const EdgeInsets.symmetric(
+                                              horizontal: 8.0),
+                                          child: Text(
+                                            truncatedMessage,
+                                            style: TextStyle(
+                                              height: 1.2,
+                                              // Adjust line height if needed
+                                              wordSpacing: 2,
+                                              color: Colors.grey,
+                                              fontSize: 14.sp,
+                                            ),
+                                            overflow: TextOverflow.ellipsis,
+                                            // Adds an ellipsis at the end of the text if it overflows
+                                            maxLines: 1,
+                                            // Limits text to 2 lines
+                                            softWrap:
+                                                true, // Allows text to wrap at soft line breaks
+                                          ),
+                                        ),
+                                  onTap: () {
+                                    Get.to(() => ChatRoomPage(
+                                          chatroom: chatRoom,
+                                          targetUserId: doctorId,
+                                        ));
+                                  },
                                 ),
-                                onTap: () async {
-                                  Get.to(
-                                    () => ChatRoomPage(
-                                      chatroom: chatRoom,
-                                      targetUserId: doctorId,
-                                    ),
-                                  );
-                                },
                               ),
                             );
                           } else {

@@ -4,7 +4,7 @@ class ChatRoomModel {
   String? chatroomid;
   Map<String, dynamic>? participants;
   String? lastMessage;
-  Timestamp? lastMessageTime; // Add this line to include the timestamp
+  Timestamp? lastMessageTime; // Added this line for timestamp
 
   ChatRoomModel({
     this.chatroomid,
@@ -13,7 +13,7 @@ class ChatRoomModel {
     this.lastMessageTime,
   });
 
-  // Update the constructor to handle the new field
+  // Constructor to initialize from a map
   ChatRoomModel.fromMap(Map<String, dynamic> map) {
     chatroomid = map["chatroomid"];
     participants = map["participants"];
@@ -21,7 +21,7 @@ class ChatRoomModel {
     lastMessageTime = map["lastMessageTime"]; // Map the new field
   }
 
-  // Update toMap to include the new field
+  // Convert to map
   Map<String, dynamic> toMap() {
     return {
       "chatroomid": chatroomid,
@@ -29,5 +29,11 @@ class ChatRoomModel {
       "lastmessage": lastMessage,
       "lastMessageTime": lastMessageTime, // Include the new field
     };
+  }
+
+  // Create an instance from a Firestore DocumentSnapshot
+  factory ChatRoomModel.fromDocument(DocumentSnapshot doc) {
+    Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+    return ChatRoomModel.fromMap(data);
   }
 }
