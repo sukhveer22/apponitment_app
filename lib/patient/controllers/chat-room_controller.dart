@@ -187,25 +187,26 @@ class ChatController extends GetxController {
       MessageModel newMessage = MessageModel(
         messageid: Uuid().v1(),
         sender: currentUser?.uid ?? "",
-        createdon: DateTime.now(),
+        createdon: DateTime.timestamp(),  // Set the creation time of the message
         text: msg,
         imageUrl: "",
         seen: false,
       );
 
       try {
-        await _firestore
-            .collection("chatRooms")
+        await _firestore.collection("chatRooms")
             .doc(chatroom.chatroomid)
             .collection("messages")
             .doc(newMessage.messageid)
             .set(newMessage.toMap());
 
-        chatroom.lastMessage = msg;
-        await _firestore
-            .collection("chatRooms")
+        // Update the lastMessage and lastMessageTimestamp fields
+        await _firestore.collection("chatRooms")
             .doc(chatroom.chatroomid)
-            .set(chatroom.toMap());
+            .update({
+          'lastMessage': msg,
+          'lastMessageTimestamp': FieldValue.serverTimestamp(),  // Use server timestamp
+        });
 
         print("Message Sent!");
       } catch (e) {
@@ -214,6 +215,7 @@ class ChatController extends GetxController {
       }
     }
   }
+
 
   void monitorTyping() {
     _firestore

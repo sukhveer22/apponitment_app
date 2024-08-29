@@ -32,7 +32,7 @@ class DoctorLoginController extends GetxController {
         password: passwordController.text.trim(),
       );
       if (userCredential.user?.email != null) {
-        Get.off(Doctordashborad());
+        Get.off(DoctorDashboard());
         Get.snackbar('Success', 'Login successful');
       }
     } catch (e) {

@@ -1,4 +1,5 @@
 import 'package:app_apponitmnet/util/doctor_util.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -124,5 +125,13 @@ class SearchsController extends GetxController {
     }
 
     return chatRoom;
+  }
+}
+class SearchssController extends GetxController {
+  final TextEditingController textController = TextEditingController();
+  var searchQuery = ''.obs;
+
+  void updateSearchQuery(String query) {
+    searchQuery.value = query.toLowerCase();
   }
 }

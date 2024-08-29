@@ -30,10 +30,12 @@ dependencies:
   flutter_rating_bar: ^4.0.1
   dot_navigation_bar: ^1.0.2
   molten_navigationbar_flutter: ^1.0.1
-#  video_player: any
+  circle_nav_bar: ^2.1.0+1
+  cuberto_bottom_bar: ^3.1.0
+  #  video_player: any
   uid: ^0.0.2
   url_launcher: ^6.3.0
-
+  firebase_database: ^11.1.0
 
 dev_dependencies:
   flutter_test:

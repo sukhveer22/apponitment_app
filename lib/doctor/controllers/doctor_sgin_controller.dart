@@ -86,7 +86,7 @@ class DoctorSignController extends GetxController {
         await saveDoctorToFirestore(doctor);
         await saveUserToPreferences(userCredential.user!.uid);
 
-        Get.off(Doctordashborad());
+        Get.off(DoctorDashboard());
         Get.snackbar('Success', 'Signed up successfully');
       } catch (e) {
         print("Error during sign-up: $e");
