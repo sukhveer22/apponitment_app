@@ -1,0 +1,21 @@
+{
+  "flutter": {
+    "platforms": {
+      "android": {
+        "default": {
+          "projectId": "doctorappointment-f6642",
+          "appId": "1:961116291819:android:1e546e18445ee9079d34ae",
+          "fileOutput": "android/app/google-services.json"
+        }
+      },
+      "dart": {
+        "lib/firebase_options.dart": {
+          "projectId": "doctorappointment-f6642",
+          "configurations": {
+            "android": "1:961116291819:android:1e546e18445ee9079d34ae"
+          }
+        }
+      }
+    }
+  }
+}
